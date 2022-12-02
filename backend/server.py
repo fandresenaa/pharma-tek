@@ -17,21 +17,36 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 
-class Medocs:
+class Medocs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     price = db.Column(db.Integer)
 
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
 
-class MedocsSchema:
+
+class MedocsSchema(ma.Schema):
     class Meta:
         fields = ('id', 'name', 'price')
+
+
+medocs_schema = MedocsSchema()
+medocs_schema = MedocsSchema(many=True)
 # Route voloany
 
 
 @app.route('/')
 def home():
     return ('gg , ao amle API tsika ')
+
+
+@app.route('/allmed', methods=['GET'])
+def get_medocs():
+    all_medocs = Medocs.query.all()
+    results = medocs_schema.dump(all_medocs)
+    return jsonify(results)
 
 
 if __name__ == '__main__':
